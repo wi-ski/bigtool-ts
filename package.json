@@ -1,0 +1,118 @@
+{
+  "name": "bigtool-ts",
+  "version": "0.1.1",
+  "description": "Dynamic tool discovery for AI agents. Search and load tools on-demand instead of loading all tools upfront.",
+  "type": "module",
+  "license": "MIT",
+  "author": "wiski",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wi-ski/bigtool-ts"
+  },
+  "bugs": {
+    "url": "https://github.com/wi-ski/bigtool-ts/issues"
+  },
+  "homepage": "https://github.com/wi-ski/bigtool-ts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "langgraph",
+    "langchain",
+    "ai",
+    "tools",
+    "mcp",
+    "model-context-protocol",
+    "semantic-search",
+    "dynamic-tools",
+    "agents",
+    "llm"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./catalog": {
+      "types": "./dist/catalog/index.d.ts",
+      "import": "./dist/catalog/index.js"
+    },
+    "./search": {
+      "types": "./dist/search/index.d.ts",
+      "import": "./dist/search/index.js"
+    },
+    "./loader": {
+      "types": "./dist/loader/index.d.ts",
+      "import": "./dist/loader/index.js"
+    },
+    "./sources": {
+      "types": "./dist/sources/index.d.ts",
+      "import": "./dist/sources/index.js"
+    },
+    "./graph": {
+      "types": "./dist/graph/index.d.ts",
+      "import": "./dist/graph/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@orama/orama": "^3.0.0",
+    "eventemitter3": "^5.0.0",
+    "lru-cache": "^10.0.0",
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "@langchain/core": ">=0.2.0",
+    "@langchain/langgraph": ">=0.2.0",
+    "@langchain/openai": ">=0.2.0",
+    "@modelcontextprotocol/sdk": ">=1.0.0",
+    "ai": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@langchain/openai": {
+      "optional": true
+    },
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "ai": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@langchain/core": "^1.0.0",
+    "@langchain/langgraph": "^1.0.0",
+    "@langchain/openai": "^0.3.0",
+    "@types/node": "^20",
+    "typescript": "^5",
+    "vitest": "^2.0.0"
+  }
+}
