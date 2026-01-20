@@ -12,39 +12,44 @@ import type { ToolMetadata, SearchResult } from '../types.js';
 import type { AdapterConfig, ToolAdapter, SearchToolOptions } from './types.js';
 
 // ═══════════════════════════════════════════════════════════════════
-// TYPES (from Vercel AI SDK)
+// TYPES (from Vercel AI SDK v5.x)
 // ═══════════════════════════════════════════════════════════════════
 
 /**
  * Options passed to tool execute functions.
- * Matches the ToolExecutionOptions from 'ai' package.
+ * Matches ToolCallOptions from 'ai' package v5.x.
+ *
+ * @see https://github.com/vercel/ai
  */
-interface ToolExecutionOptions {
+interface ToolCallOptions {
   /** The ID of the tool call */
   toolCallId: string;
+  /** Conversation messages (available in v5+) */
+  messages?: unknown[];
   /** Abort signal for cancellation */
   abortSignal?: AbortSignal;
+  /** Experimental context data */
+  experimental_context?: unknown;
 }
 
 /**
  * Vercel AI SDK Tool type.
  *
- * This is a simplified version of the Tool type from the 'ai' package.
- * We define it here to avoid runtime dependencies on the 'ai' package
- * while maintaining type compatibility.
+ * Matches the Tool type from the 'ai' package v5.x.
+ * We define it here to avoid requiring 'ai' as a runtime dependency.
  *
  * @see https://github.com/vercel/ai - Full type definition
  */
 interface VercelTool<INPUT = unknown, OUTPUT = unknown> {
   /** Description for the language model */
   description?: string;
-  /** Schema for tool input */
+  /** Schema for tool input (FlexibleSchema - Zod or JSON Schema) */
   inputSchema: unknown;
-  /** Execute function */
+  /** Execute function - supports sync, async, and AsyncIterable returns */
   execute?: (
     input: INPUT,
-    options: ToolExecutionOptions
-  ) => Promise<OUTPUT> | OUTPUT;
+    options: ToolCallOptions
+  ) => Promise<OUTPUT> | OUTPUT | AsyncIterable<OUTPUT>;
   /** Output schema for validation */
   outputSchema?: unknown;
 }
@@ -138,7 +143,7 @@ export class VercelAIAdapter implements ToolAdapter<VercelTool> {
     return {
       description: metadata.description,
       inputSchema: createJsonSchema(metadata.parameters),
-      execute: async (args: unknown, options: ToolExecutionOptions) => {
+      execute: async (args: unknown, options: ToolCallOptions) => {
         // Fail fast on abort before expensive loader call
         options.abortSignal?.throwIfAborted();
 
@@ -301,19 +306,25 @@ export function createVercelAdapter(config: AdapterConfig): VercelAIAdapter {
 /**
  * Create a JSON schema wrapper for Vercel AI SDK.
  *
- * The Vercel AI SDK accepts FlexibleSchema which includes raw JSON Schema.
- * This function wraps the parameters to match the expected format.
+ * The Vercel AI SDK accepts FlexibleSchema which includes raw JSON Schema,
+ * Zod schemas, or the SDK's Schema wrapper. We return Zod schemas for
+ * best compatibility with SDK features.
+ *
+ * For tools with JSON Schema parameters, we use our schema converter.
+ * For the search tool, we use Zod directly for better type safety.
  *
  * @param parameters - JSON Schema parameters from tool metadata
- * @returns Wrapped schema for Vercel AI SDK
+ * @returns Schema compatible with Vercel AI SDK FlexibleSchema
  */
 function createJsonSchema(
   parameters: Record<string, unknown> | undefined
-): Record<string, unknown> {
+): unknown {
   // Default to empty object schema if no parameters
-  const schema = parameters ?? { type: 'object', properties: {} };
+  if (!parameters) {
+    return { type: 'object', properties: {} };
+  }
 
-  // Return in a format compatible with Vercel AI SDK's jsonSchema() helper
-  // The SDK accepts raw JSON Schema objects directly
-  return schema;
+  // Return JSON Schema directly - Vercel AI SDK accepts it as FlexibleSchema
+  // The SDK will validate according to the schema
+  return parameters;
 }

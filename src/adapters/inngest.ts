@@ -28,6 +28,7 @@
 import { z } from 'zod';
 import type { ToolMetadata } from '../types.js';
 import type { AdapterConfig, SearchToolOptions, ToolAdapter } from './types.js';
+import { jsonSchemaToZod } from './schema-utils.js';
 
 // ═══════════════════════════════════════════════════════════════════
 // INNGEST TYPES (Type-only imports to avoid runtime dependency)
@@ -140,10 +141,9 @@ export class InngestAdapter implements ToolAdapter<InngestTool> {
    * The resulting tool wraps the bigtool-ts loader and automatically
    * uses step.run() for durable execution when available.
    *
-   * **Note:** Parameter schemas are not converted from ToolMetadata to Zod.
-   * The underlying bigtool-ts tool handles its own input validation.
-   * If you need Inngest-side schema validation, provide tools with Zod
-   * schemas directly rather than using the adapter.
+   * Parameter schemas are converted from JSON Schema to Zod using a
+   * simplified converter. For complex schemas, provide tools with Zod
+   * schemas directly.
    *
    * @param metadata - Tool metadata from the catalog
    * @returns Inngest-compatible tool
@@ -151,13 +151,15 @@ export class InngestAdapter implements ToolAdapter<InngestTool> {
   toFrameworkTool(metadata: ToolMetadata): InngestTool {
     const loader = this.loader;
 
-    // Note: We don't convert metadata.parameters (JSON Schema) to Zod because
-    // the conversion is complex and error-prone. The underlying tool validates
-    // its own input. If Zod schemas are needed, use createTool directly.
+    // Convert JSON Schema parameters to Zod for AgentKit validation
+    const parameters = metadata.parameters
+      ? jsonSchemaToZod(metadata.parameters)
+      : undefined;
+
     return {
       name: metadata.name,
       description: metadata.description,
-      parameters: undefined,
+      parameters,
       handler: async (input: unknown, opts: InngestToolOptions) => {
         const execute = async () => {
           const tool = await loader.load(metadata.id);

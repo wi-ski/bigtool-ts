@@ -31,10 +31,11 @@ import type { AdapterConfig, ToolAdapter, SearchToolOptions } from './types.js';
 /**
  * Mastra tool execution context.
  *
+ * Matches `ToolExecutionContext` from `@mastra/core/tools` (v0.24+).
  * Provides access to Mastra runtime services during tool execution.
  * All properties are optional to handle various execution contexts.
  */
-export interface MastraToolContext {
+export interface MastraToolContext<TSuspend = unknown, TResume = unknown> {
     /** Mastra runtime instance for accessing services */
     mastra?: unknown;
     /** Request context for HTTP-triggered executions */
@@ -43,22 +44,53 @@ export interface MastraToolContext {
     tracingContext?: unknown;
     /** Abort signal for cancellation support */
     abortSignal?: AbortSignal;
-    /** Agent-specific context (suspend/resume support) */
-    agent?: unknown;
-    /** Workflow-specific context */
-    workflow?: unknown;
+    /** Agent-specific context (when called from agent) */
+    agent?: {
+        /** ID of the tool call from the LLM */
+        toolCallId: string;
+        /** Conversation messages */
+        messages: unknown[];
+        /** Suspend execution and wait for input */
+        suspend?: (payload: TSuspend, options?: unknown) => Promise<void>;
+        /** Thread identifier for memory */
+        threadId?: string;
+        /** Resource identifier */
+        resourceId?: string;
+        /** Data from previous suspend (if resuming) */
+        resumeData?: TResume;
+    };
+    /** Workflow-specific context (when called from workflow) */
+    workflow?: {
+        /** Workflow run identifier */
+        runId: string;
+        /** Workflow definition identifier */
+        workflowId: string;
+        /** Current workflow state */
+        state: unknown;
+        /** Update workflow state */
+        setState: (state: unknown) => void;
+        /** Suspend workflow and wait for input */
+        suspend?: (payload: TSuspend, options?: unknown) => Promise<void>;
+        /** Data from previous suspend (if resuming) */
+        resumeData?: TResume;
+    };
+    /** MCP-specific context (when called via Model Context Protocol) */
+    mcp?: {
+        /** MCP protocol extra context */
+        extra: unknown;
+    };
 }
 /**
  * Mastra tool definition shape.
  *
- * This matches the output of `createTool()` from `@mastra/core/tools`.
+ * Matches the output of `createTool()` from `@mastra/core/tools` (v0.24+).
  *
  * Key differences from other frameworks:
  * - Uses `id` only (no `name` property)
  * - Execute signature: `(inputData, context?)` NOT `({ input })`
- * - Context is optional second parameter
+ * - Context is optional second parameter with agent/workflow context
  */
-export interface MastraTool<TInput = unknown, TOutput = unknown> {
+export interface MastraTool<TInput = unknown, TOutput = unknown, TSuspend = unknown, TResume = unknown> {
     /** Unique identifier for the tool */
     id: string;
     /** Description of what the tool does */
@@ -68,7 +100,9 @@ export interface MastraTool<TInput = unknown, TOutput = unknown> {
     /** Zod schema for output validation (null if not specified) */
     outputSchema: z.ZodSchema<TOutput> | undefined;
     /** Tool execution function */
-    execute: (inputData: TInput, context?: MastraToolContext) => Promise<TOutput>;
+    execute: (inputData: TInput, context?: MastraToolContext<TSuspend, TResume>) => Promise<TOutput>;
+    /** Whether tool requires human approval before execution */
+    requireApproval?: boolean;
 }
 /**
  * Adapter for converting bigtool-ts tools to Mastra format.
@@ -98,6 +132,8 @@ export declare class MastraAdapter implements ToolAdapter<MastraTool> {
      *
      * Creates a Mastra-compatible tool definition that lazily loads
      * and executes the underlying bigtool-ts tool implementation.
+     *
+     * Supports abort signal propagation for cancellation.
      *
      * @param metadata - Tool metadata from the catalog
      * @returns Mastra tool definition

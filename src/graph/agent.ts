@@ -18,6 +18,7 @@ import {
   createSearchNode,
   createExecuteNode,
   routeNode,
+  routeAfterSearch,
 } from "./nodes.js";
 import { createSearchToolsTool } from "./search-tool.js";
 import { DefaultToolCatalog } from "../catalog/index.js";
@@ -276,6 +277,13 @@ export async function createAgent(
   });
 
   // 7. Build the graph
+  //
+  // Graph structure handles mixed tool calls (search + execute in same turn):
+  //   START -> agent
+  //   agent -> (conditional: search | execute | END)
+  //   search -> (conditional: execute if non-search calls remain | agent)
+  //   execute -> agent
+  //
   const workflow = new StateGraph(ToolDiscoveryAnnotation)
     .addNode(
       "agent",
@@ -309,7 +317,11 @@ export async function createAgent(
       execute: "execute",
       end: END,
     })
-    .addEdge("search", "agent")
+    // After search, check if there are non-search tool calls to execute
+    .addConditionalEdges("search", routeAfterSearch, {
+      execute: "execute",
+      agent: "agent",
+    })
     .addEdge("execute", "agent");
 
   // 8. Compile and return

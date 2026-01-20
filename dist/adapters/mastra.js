@@ -62,6 +62,8 @@ export class MastraAdapter {
      * Creates a Mastra-compatible tool definition that lazily loads
      * and executes the underlying bigtool-ts tool implementation.
      *
+     * Supports abort signal propagation for cancellation.
+     *
      * @param metadata - Tool metadata from the catalog
      * @returns Mastra tool definition
      */
@@ -74,7 +76,9 @@ export class MastraAdapter {
             description: metadata.description,
             inputSchema,
             outputSchema: undefined,
-            execute: async (inputData) => {
+            execute: async (inputData, context) => {
+                // Fail fast on abort before expensive loader call
+                context?.abortSignal?.throwIfAborted();
                 const tool = await loader.load(metadata.id);
                 return tool.invoke(inputData);
             },

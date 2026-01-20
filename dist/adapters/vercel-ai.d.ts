@@ -10,30 +10,35 @@ import type { ToolMetadata } from '../types.js';
 import type { AdapterConfig, ToolAdapter, SearchToolOptions } from './types.js';
 /**
  * Options passed to tool execute functions.
- * Matches the ToolExecutionOptions from 'ai' package.
+ * Matches ToolCallOptions from 'ai' package v5.x.
+ *
+ * @see https://github.com/vercel/ai
  */
-interface ToolExecutionOptions {
+interface ToolCallOptions {
     /** The ID of the tool call */
     toolCallId: string;
+    /** Conversation messages (available in v5+) */
+    messages?: unknown[];
     /** Abort signal for cancellation */
     abortSignal?: AbortSignal;
+    /** Experimental context data */
+    experimental_context?: unknown;
 }
 /**
  * Vercel AI SDK Tool type.
  *
- * This is a simplified version of the Tool type from the 'ai' package.
- * We define it here to avoid runtime dependencies on the 'ai' package
- * while maintaining type compatibility.
+ * Matches the Tool type from the 'ai' package v5.x.
+ * We define it here to avoid requiring 'ai' as a runtime dependency.
  *
  * @see https://github.com/vercel/ai - Full type definition
  */
 interface VercelTool<INPUT = unknown, OUTPUT = unknown> {
     /** Description for the language model */
     description?: string;
-    /** Schema for tool input */
+    /** Schema for tool input (FlexibleSchema - Zod or JSON Schema) */
     inputSchema: unknown;
-    /** Execute function */
-    execute?: (input: INPUT, options: ToolExecutionOptions) => Promise<OUTPUT> | OUTPUT;
+    /** Execute function - supports sync, async, and AsyncIterable returns */
+    execute?: (input: INPUT, options: ToolCallOptions) => Promise<OUTPUT> | OUTPUT | AsyncIterable<OUTPUT>;
     /** Output schema for validation */
     outputSchema?: unknown;
 }

@@ -88,11 +88,23 @@ export declare function searchNode(_state: ToolDiscoveryState, _config: Runnable
  * Routing function - determines next node based on last message.
  *
  * Returns:
- * - "search" if agent called search_tools
+ * - "search" if agent called search_tools (search takes priority)
  * - "execute" if agent called other tools
  * - "end" if agent responded without tool calls
  */
 export declare function routeNode(state: ToolDiscoveryState): "search" | "execute" | "end";
+/**
+ * Routing function after search - checks if there are non-search tool calls.
+ *
+ * When the LLM calls both search_tools AND other tools in the same turn,
+ * after search completes we need to check if there are remaining tool calls
+ * to execute.
+ *
+ * Returns:
+ * - "execute" if there are non-search tool calls in the original AI message
+ * - "agent" if only search was called
+ */
+export declare function routeAfterSearch(state: ToolDiscoveryState): "execute" | "agent";
 /**
  * @deprecated Use createExecuteNode instead
  */

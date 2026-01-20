@@ -278,7 +278,7 @@ export async function searchNode(
  * Routing function - determines next node based on last message.
  *
  * Returns:
- * - "search" if agent called search_tools
+ * - "search" if agent called search_tools (search takes priority)
  * - "execute" if agent called other tools
  * - "end" if agent responded without tool calls
  */
@@ -299,12 +299,53 @@ export function routeNode(state: ToolDiscoveryState): "search" | "execute" | "en
     return "end";
   }
 
-  // Check if it's a search request
+  // Search takes priority - we need discovered tools first
   const hasSearchCall = lastMessage.tool_calls.some(
     (tc) => tc.name === "search_tools"
   );
 
   return hasSearchCall ? "search" : "execute";
+}
+
+/**
+ * Routing function after search - checks if there are non-search tool calls.
+ *
+ * When the LLM calls both search_tools AND other tools in the same turn,
+ * after search completes we need to check if there are remaining tool calls
+ * to execute.
+ *
+ * Returns:
+ * - "execute" if there are non-search tool calls in the original AI message
+ * - "agent" if only search was called
+ */
+export function routeAfterSearch(state: ToolDiscoveryState): "execute" | "agent" {
+  // Find the AI message that triggered the search (before ToolMessage responses)
+  const messages = state.messages;
+
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+
+    // Skip ToolMessages (search results)
+    if (msg._getType() === "tool") {
+      continue;
+    }
+
+    // Found the AI message
+    if (isAIMessage(msg) && msg.tool_calls?.length) {
+      const hasNonSearchCalls = msg.tool_calls.some(
+        (tc) => tc.name !== "search_tools"
+      );
+      if (hasNonSearchCalls) {
+        return "execute";
+      }
+      break;
+    }
+
+    // If we hit a non-AI, non-tool message, stop looking
+    break;
+  }
+
+  return "agent";
 }
 
 /**

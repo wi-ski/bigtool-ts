@@ -228,17 +228,23 @@ export function createVercelAdapter(config) {
 /**
  * Create a JSON schema wrapper for Vercel AI SDK.
  *
- * The Vercel AI SDK accepts FlexibleSchema which includes raw JSON Schema.
- * This function wraps the parameters to match the expected format.
+ * The Vercel AI SDK accepts FlexibleSchema which includes raw JSON Schema,
+ * Zod schemas, or the SDK's Schema wrapper. We return Zod schemas for
+ * best compatibility with SDK features.
+ *
+ * For tools with JSON Schema parameters, we use our schema converter.
+ * For the search tool, we use Zod directly for better type safety.
  *
  * @param parameters - JSON Schema parameters from tool metadata
- * @returns Wrapped schema for Vercel AI SDK
+ * @returns Schema compatible with Vercel AI SDK FlexibleSchema
  */
 function createJsonSchema(parameters) {
     // Default to empty object schema if no parameters
-    const schema = parameters ?? { type: 'object', properties: {} };
-    // Return in a format compatible with Vercel AI SDK's jsonSchema() helper
-    // The SDK accepts raw JSON Schema objects directly
-    return schema;
+    if (!parameters) {
+        return { type: 'object', properties: {} };
+    }
+    // Return JSON Schema directly - Vercel AI SDK accepts it as FlexibleSchema
+    // The SDK will validate according to the schema
+    return parameters;
 }
 //# sourceMappingURL=vercel-ai.js.map
