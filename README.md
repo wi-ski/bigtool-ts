@@ -12,12 +12,13 @@ Works with **LangGraph**, **Inngest AgentKit**, **Vercel AI SDK**, **Mastra**, a
 Anthropic faced the same problem with [Claude Code](https://www.anthropic.com/products/claude-code) and MCP servers: **loading all tool definitions upfront consumed too much context**.
 
 Their solution? **Tool Search** with `defer_loading`:
+
 - Mark tools with `defer_loading: true`
 - Claude discovers tools on-demand via BM25 search
 - **85% reduction in token usage** (67K → 8.5K tokens)
 - **Accuracy improved from 49% to 74%** on MCP evaluations
 
-> *"Claude Code adds Tool Search to lazily load MCP tools, cutting context waste and improving accuracy for large agent toolsets."* — [Tool Search now in Claude Code](https://medium.com/coding-nexus/tool-search-now-in-claude-code-17128204740e)
+> _"Claude Code adds Tool Search to lazily load MCP tools, cutting context waste and improving accuracy for large agent toolsets."_ — [Tool Search now in Claude Code](https://medium.com/coding-nexus/tool-search-now-in-claude-code-17128204740e)
 
 **bigtool-ts brings this same capability to any LLM** — not just Claude's native API. Use it with LangGraph, OpenAI, Vercel AI SDK, Inngest, or any LangChain-compatible model.
 
@@ -153,8 +154,8 @@ const agent = createAgent({
   name: "tool-user",
   model: openai({ model: "gpt-4o" }),
   tools: [
-    adapter.createSearchTool(),    // Search for tools
-    adapter.createCallToolTool(),  // Execute found tools
+    adapter.createSearchTool(), // Search for tools
+    adapter.createCallToolTool(), // Execute found tools
   ],
 });
 ```
@@ -195,7 +196,7 @@ const result = await generateText({
   model: openai("gpt-4o"),
   tools: {
     search_tools: adapter.createSearchTool(),
-    ...await adapter.getToolsAsRecord(["github:create_pr", "slack:send"]),
+    ...(await adapter.getToolsAsRecord(["github:create_pr", "slack:send"])),
   },
   prompt: "Create a PR and notify the team on Slack",
 });
@@ -238,7 +239,7 @@ const agent = new Agent({
   model: "openai/gpt-4o",
   tools: {
     search_tools: adapter.createSearchTool(),
-    ...await adapter.getToolsAsRecord(["github:create_pr"]),
+    ...(await adapter.getToolsAsRecord(["github:create_pr"])),
   },
 });
 ```
@@ -266,7 +267,11 @@ await search.index(catalog.getAllMetadata());
 const loader = new DefaultToolLoader(catalog);
 
 // Create handler
-const handler = createAgentProtocolHandler({ catalog, loader, searchIndex: search });
+const handler = createAgentProtocolHandler({
+  catalog,
+  loader,
+  searchIndex: search,
+});
 
 // Use with Express/Fastify/any HTTP framework
 app.get("/tools", async (req, res) => {
@@ -302,14 +307,14 @@ const agent = await createAgent({
   search: new OramaSearch({ mode: "bm25" }),
 
   // Tool sources (pick one or combine)
-  tools: [tool1, tool2],           // Array of StructuredTool
+  tools: [tool1, tool2], // Array of StructuredTool
   sources: [localSource, mcpSource], // Array of ToolSource
 
   // Optional
   pinnedTools: [alwaysAvailableTool], // Always in context
   systemPrompt: "You are a helpful assistant.",
-  searchLimit: 5,                  // Max tools per search (default: 5)
-  cacheSize: 100,                  // LRU cache size (default: 100)
+  searchLimit: 5, // Max tools per search (default: 5)
+  cacheSize: 100, // LRU cache size (default: 100)
 });
 
 // Use like any LangGraph agent
@@ -380,8 +385,8 @@ const mcpClient = new Client({ name: "my-client" });
 await mcpClient.connect(transport);
 
 const source = new MCPSource(mcpClient, {
-  namespace: "github",          // Tool ID prefix (default: client.name)
-  refreshInterval: 60_000,      // Re-fetch tool list every 60s
+  namespace: "github", // Tool ID prefix (default: client.name)
+  refreshInterval: 60_000, // Re-fetch tool list every 60s
 });
 
 // Listen for tool list changes
@@ -399,15 +404,30 @@ source.dispose();
 import { createMCPSource } from "bigtool-ts";
 
 const mcpConfigs = [
-  { name: "github", transport: "stdio", command: "npx", args: ["-y", "@mcp/server-github"] },
-  { name: "slack", transport: "stdio", command: "npx", args: ["-y", "@mcp/server-slack"] },
-  { name: "notion", transport: "stdio", command: "npx", args: ["-y", "@mcp/server-notion"] },
+  {
+    name: "github",
+    transport: "stdio",
+    command: "npx",
+    args: ["-y", "@mcp/server-github"],
+  },
+  {
+    name: "slack",
+    transport: "stdio",
+    command: "npx",
+    args: ["-y", "@mcp/server-slack"],
+  },
+  {
+    name: "notion",
+    transport: "stdio",
+    command: "npx",
+    args: ["-y", "@mcp/server-notion"],
+  },
   // ... 97 more
 ];
 
 // Connect to all servers in parallel
 const sources = await Promise.all(
-  mcpConfigs.map(config => createMCPSource(config))
+  mcpConfigs.map((config) => createMCPSource(config)),
 );
 
 // Register all
@@ -470,10 +490,10 @@ const search = new OramaSearch({ mode: "bm25" });
 const search = new OramaSearch({
   mode: "bm25",
   boost: {
-    name: 2,        // Tool name matches worth 2x
-    keywords: 1.5,  // Keyword matches worth 1.5x
+    name: 2, // Tool name matches worth 2x
+    keywords: 1.5, // Keyword matches worth 1.5x
     description: 1, // Normal weight
-    categories: 1,  // Normal weight
+    categories: 1, // Normal weight
   },
 });
 ```
@@ -507,8 +527,8 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 const search = new OramaSearch({
   mode: "hybrid",
   embeddings: new OpenAIEmbeddings(),
-  weights: { 
-    bm25: 0.4,   // 40% keyword matching
+  weights: {
+    bm25: 0.4, // 40% keyword matching
     vector: 0.6, // 60% semantic similarity
   },
   boost: {
@@ -524,18 +544,18 @@ const search = new OramaSearch({
 
 #### Search Mode Comparison
 
-| Mode | Speed | API Keys | Best For |
-|------|-------|----------|----------|
-| `bm25` | ⚡ Fast | None | Exact matches, offline use |
-| `vector` | 🐢 Slower | Required | Semantic similarity |
+| Mode     | Speed     | API Keys | Best For                      |
+| -------- | --------- | -------- | ----------------------------- |
+| `bm25`   | ⚡ Fast   | None     | Exact matches, offline use    |
+| `vector` | 🐢 Slower | Required | Semantic similarity           |
 | `hybrid` | 🐢 Slower | Required | Large catalogs, mixed queries |
 
 #### Search Options
 
 ```typescript
 const results = await search.search("create github pr", {
-  limit: 10,           // Max results (default: 5)
-  threshold: 0.3,      // Min score 0-1 (default: 0)
+  limit: 10, // Max results (default: 5)
+  threshold: 0.3, // Min score 0-1 (default: 0)
   categories: ["git"], // Filter by category
 });
 
@@ -571,8 +591,8 @@ const agent = await createAgent({
   tools: myLargeToolCollection,
   search: new OramaSearch({ mode: "bm25" }),
   pinnedTools: [
-    helpTool,      // "Show available commands"
-    exitTool,      // "End the conversation"
+    helpTool, // "Show available commands"
+    exitTool, // "End the conversation"
   ],
 });
 ```

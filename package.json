@@ -1,6 +1,6 @@
 {
   "name": "bigtool-ts",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Dynamic tool discovery for AI agents. Search and load tools on-demand instead of loading all tools upfront.",
   "type": "module",
   "license": "MIT",
@@ -81,7 +81,12 @@
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "benchmark:generate": "tsx benchmarks/tools/generate-all.ts",
+    "benchmark:generate:128": "tsx benchmarks/tools/generate-all.ts --limit=128",
+    "benchmark": "tsx benchmarks/harness/runner.ts",
+    "benchmark:quick": "tsx benchmarks/harness/runner.ts --quick",
+    "benchmark:report": "tsx benchmarks/harness/reporter.ts"
   },
   "dependencies": {
     "@orama/orama": "^3.0.0",
@@ -112,6 +117,7 @@
     "@langchain/langgraph": "^1.0.0",
     "@langchain/openai": "^0.3.0",
     "@types/node": "^20",
+    "tsx": "^4.7.0",
     "typescript": "^5",
     "vitest": "^2.0.0"
   }
