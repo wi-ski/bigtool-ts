@@ -7,8 +7,31 @@ Works with **LangGraph**, **Inngest AgentKit**, **Vercel AI SDK**, **Mastra**, a
 [![npm version](https://img.shields.io/npm/v/bigtool-ts)](https://www.npmjs.com/package/bigtool-ts)
 [![license](https://img.shields.io/npm/l/bigtool-ts)](https://github.com/wi-ski/bigtool-ts/blob/main/LICENSE)
 
+## Inspired by Claude's Tool Search
+
+Anthropic faced the same problem with [Claude Code](https://www.anthropic.com/products/claude-code) and MCP servers: **loading all tool definitions upfront consumed too much context**.
+
+Their solution? **Tool Search** with `defer_loading`:
+- Mark tools with `defer_loading: true`
+- Claude discovers tools on-demand via BM25 search
+- **85% reduction in token usage** (67K → 8.5K tokens)
+- **Accuracy improved from 49% to 74%** on MCP evaluations
+
+> *"Claude Code adds Tool Search to lazily load MCP tools, cutting context waste and improving accuracy for large agent toolsets."* — [Tool Search now in Claude Code](https://medium.com/coding-nexus/tool-search-now-in-claude-code-17128204740e)
+
+**bigtool-ts brings this same capability to any LLM** — not just Claude's native API. Use it with LangGraph, OpenAI, Vercel AI SDK, Inngest, or any LangChain-compatible model.
+
+### Further Reading
+
+- [Claude Code Just Cut MCP Context Bloat by 46.9%](https://medium.com/@joe.njenga/claude-code-just-cut-mcp-context-bloat-by-46-9-51k-tokens-down-to-8-5k-with-new-tool-search-ddf9e905f734) — Deep dive into the token savings
+- [Claude Code Finally Gets Lazy Loading for MCP Tools](https://jpcaparas.medium.com/claude-code-finally-gets-lazy-loading-for-mcp-tools-explained-39b613d1d5cc) — Explains why tool definitions are expensive
+- [VentureBeat: Claude Code just got updated](https://venturebeat.com/orchestration/claude-code-just-got-updated-with-one-of-the-most-requested-user-features) — Coverage of Anthropic's announcement
+- [YouTube: Claude Code New Lazy-MCP Loading](https://www.youtube.com/watch?v=qBE4OVS6Nho) — Video explanation of the feature
+- [Claude Code Changelog](https://www.claudelog.com/claude-code-changelog/) — Official changelog with Tool Search updates
+
 ## Table of Contents
 
+- [Inspired by Claude's Tool Search](#inspired-by-claudes-tool-search)
 - [The Problem](#the-problem)
 - [Quick Start](#quick-start)
 - [Framework Integrations](#framework-integrations)
