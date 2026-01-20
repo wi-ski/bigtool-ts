@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output (keep dist/ for GitHub users)
+# dist/
+
+# Test cache
+.vite/
+coverage/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files (using workspace root)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
