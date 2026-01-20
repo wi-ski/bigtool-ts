@@ -48,7 +48,7 @@ Their solution? **Tool Search** with `defer_loading`:
   - [MCPSource / createMCPSource](#mcpsource--createmcpsource)
   - [DynamicSource](#dynamicsource)
   - [withMetadata](#withmetadatatool-enhancement)
-  - [OramaSearch](#oramasearch)
+  - [BigToolSearch](#bigtoolsearch)
 - [Advanced Usage](#advanced-usage)
 - [Architecture](#architecture)
 
@@ -71,13 +71,13 @@ pnpm add bigtool-ts
 ```
 
 ```typescript
-import { createAgent, LocalSource, OramaSearch } from "bigtool-ts";
+import { createAgent, LocalSource, BigToolSearch } from "bigtool-ts";
 import { ChatOpenAI } from "@langchain/openai";
 
 const agent = await createAgent({
   llm: new ChatOpenAI({ model: "gpt-4o" }),
   tools: [myCalculatorTool, myDatabaseTool, myGitHubTool],
-  search: new OramaSearch({ mode: "bm25" }),
+  search: new BigToolSearch({ mode: "bm25" }),
 });
 
 const result = await agent.invoke({
@@ -105,13 +105,13 @@ bigtool-ts works with multiple AI agent frameworks. Choose your framework below 
 Native integration via `createAgent()`. Returns a compiled StateGraph.
 
 ```typescript
-import { createAgent, LocalSource, OramaSearch } from "bigtool-ts";
+import { createAgent, LocalSource, BigToolSearch } from "bigtool-ts";
 import { ChatOpenAI } from "@langchain/openai";
 
 const agent = await createAgent({
   llm: new ChatOpenAI({ model: "gpt-4o" }),
   tools: [myCalculatorTool, myDatabaseTool, myGitHubTool],
-  search: new OramaSearch({ mode: "bm25" }),
+  search: new BigToolSearch({ mode: "bm25" }),
 });
 
 const result = await agent.invoke({
@@ -133,7 +133,7 @@ import {
   createInngestAdapter,
   DefaultToolCatalog,
   DefaultToolLoader,
-  OramaSearch,
+  BigToolSearch,
   LocalSource,
 } from "bigtool-ts";
 
@@ -141,7 +141,7 @@ import {
 const catalog = new DefaultToolCatalog();
 await catalog.register(new LocalSource(myTools));
 
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 await search.index(catalog.getAllMetadata());
 
 const loader = new DefaultToolLoader(catalog);
@@ -175,7 +175,7 @@ import {
   createVercelAdapter,
   DefaultToolCatalog,
   DefaultToolLoader,
-  OramaSearch,
+  BigToolSearch,
   LocalSource,
 } from "bigtool-ts";
 
@@ -183,7 +183,7 @@ import {
 const catalog = new DefaultToolCatalog();
 await catalog.register(new LocalSource(myTools));
 
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 await search.index(catalog.getAllMetadata());
 
 const loader = new DefaultToolLoader(catalog);
@@ -216,7 +216,7 @@ import {
   createMastraAdapter,
   DefaultToolCatalog,
   DefaultToolLoader,
-  OramaSearch,
+  BigToolSearch,
   LocalSource,
 } from "bigtool-ts";
 
@@ -224,7 +224,7 @@ import {
 const catalog = new DefaultToolCatalog();
 await catalog.register(new LocalSource(myTools));
 
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 await search.index(catalog.getAllMetadata());
 
 const loader = new DefaultToolLoader(catalog);
@@ -253,7 +253,7 @@ import {
   createAgentProtocolHandler,
   DefaultToolCatalog,
   DefaultToolLoader,
-  OramaSearch,
+  BigToolSearch,
   LocalSource,
 } from "bigtool-ts";
 
@@ -261,7 +261,7 @@ import {
 const catalog = new DefaultToolCatalog();
 await catalog.register(new LocalSource(myTools));
 
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 await search.index(catalog.getAllMetadata());
 
 const loader = new DefaultToolLoader(catalog);
@@ -299,12 +299,12 @@ app.post("/tools/execute", async (req, res) => {
 Creates a LangGraph agent with dynamic tool discovery.
 
 ```typescript
-import { createAgent, OramaSearch } from "bigtool-ts";
+import { createAgent, BigToolSearch } from "bigtool-ts";
 
 const agent = await createAgent({
   // Required
   llm: new ChatOpenAI({ model: "gpt-4o" }),
-  search: new OramaSearch({ mode: "bm25" }),
+  search: new BigToolSearch({ mode: "bm25" }),
 
   // Tool sources (pick one or combine)
   tools: [tool1, tool2], // Array of StructuredTool
@@ -473,7 +473,7 @@ const enhanced = withMetadata(myGitHubTool, {
 const source = new LocalSource([enhanced, otherTool]);
 ```
 
-### `OramaSearch`
+### `BigToolSearch`
 
 Search index powered by [@orama/orama](https://oramasearch.com/). Supports three modes for different use cases.
 
@@ -482,12 +482,12 @@ Search index powered by [@orama/orama](https://oramasearch.com/). Supports three
 Fast keyword-based search. **No API keys needed.**
 
 ```typescript
-import { OramaSearch } from "bigtool-ts";
+import { BigToolSearch } from "bigtool-ts";
 
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 
 // Or with field boosting
-const search = new OramaSearch({
+const search = new BigToolSearch({
   mode: "bm25",
   boost: {
     name: 2, // Tool name matches worth 2x
@@ -505,10 +505,10 @@ const search = new OramaSearch({
 Semantic search using embeddings. Finds conceptually similar tools even without exact keyword matches.
 
 ```typescript
-import { OramaSearch } from "bigtool-ts";
+import { BigToolSearch } from "bigtool-ts";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
-const search = new OramaSearch({
+const search = new BigToolSearch({
   mode: "vector",
   embeddings: new OpenAIEmbeddings(),
 });
@@ -521,10 +521,10 @@ const search = new OramaSearch({
 Combines BM25 and vector search for best of both worlds.
 
 ```typescript
-import { OramaSearch } from "bigtool-ts";
+import { BigToolSearch } from "bigtool-ts";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
-const search = new OramaSearch({
+const search = new BigToolSearch({
   mode: "hybrid",
   embeddings: new OpenAIEmbeddings(),
   weights: {
@@ -568,7 +568,7 @@ const results = await search.search("create github pr", {
 ### Combining Multiple Sources
 
 ```typescript
-import { createAgent, LocalSource, MCPSource, OramaSearch } from "bigtool-ts";
+import { createAgent, LocalSource, MCPSource, BigToolSearch } from "bigtool-ts";
 
 const agent = await createAgent({
   llm,
@@ -577,7 +577,7 @@ const agent = await createAgent({
     new MCPSource(githubMcp, { namespace: "github" }),
     new MCPSource(slackMcp, { namespace: "slack" }),
   ],
-  search: new OramaSearch({ mode: "bm25" }),
+  search: new BigToolSearch({ mode: "bm25" }),
 });
 ```
 
@@ -589,7 +589,7 @@ Some tools should always be in context without searching:
 const agent = await createAgent({
   llm,
   tools: myLargeToolCollection,
-  search: new OramaSearch({ mode: "bm25" }),
+  search: new BigToolSearch({ mode: "bm25" }),
   pinnedTools: [
     helpTool, // "Show available commands"
     exitTool, // "End the conversation"
@@ -605,7 +605,7 @@ For advanced use cases, build components individually:
 import {
   DefaultToolCatalog,
   DefaultToolLoader,
-  OramaSearch,
+  BigToolSearch,
   LocalSource,
 } from "bigtool-ts";
 
@@ -616,7 +616,7 @@ const catalog = new DefaultToolCatalog();
 await catalog.register(new LocalSource(tools));
 
 // 3. Create search index
-const search = new OramaSearch({ mode: "bm25" });
+const search = new BigToolSearch({ mode: "bm25" });
 await search.index(catalog.getAllMetadata());
 
 // 4. Create loader with custom cache settings
@@ -657,7 +657,7 @@ catalog.onToolsChanged.on(({ added, removed }) => {
               ┌───────────────┴───────────────┐
               ▼                               ▼
 ┌─────────────────────────┐     ┌─────────────────────────┐
-│      OramaSearch        │     │   DefaultToolLoader     │
+│      BigToolSearch        │     │   DefaultToolLoader     │
 │  BM25 / Vector / Hybrid │     │    LRU-cached loading   │
 │                         │     │                         │
 │  query → [toolId, ...]  │     │  toolId → StructuredTool│

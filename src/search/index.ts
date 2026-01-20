@@ -1,9 +1,9 @@
 import type { SearchIndex, SearchOptions, SearchResult, ToolMetadata } from '../types.js';
 
 /**
- * Configuration for Orama-based search
+ * Configuration for BigTool search
  */
-export interface OramaSearchConfig {
+export interface BigToolSearchConfig {
   /** Search mode */
   mode: 'bm25' | 'vector' | 'hybrid';
   
@@ -29,6 +29,11 @@ export interface OramaSearchConfig {
 }
 
 /**
+ * @deprecated Use BigToolSearchConfig instead
+ */
+export type OramaSearchConfig = BigToolSearchConfig;
+
+/**
  * Default search implementation using @orama/orama for BM25 search.
  * 
  * Supports three modes:
@@ -39,28 +44,28 @@ export interface OramaSearchConfig {
  * @example
  * ```typescript
  * // BM25 mode (default)
- * const search = new OramaSearch();
+ * const search = new BigToolSearch();
  * 
  * // Vector mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'vector',
  *   embeddings: new OpenAIEmbeddings(),
  * });
  * 
  * // Hybrid mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'hybrid',
  *   embeddings: new OpenAIEmbeddings(),
  *   weights: { bm25: 0.5, vector: 0.5 },
  * });
  * ```
  */
-export class OramaSearch implements SearchIndex {
-  private config: OramaSearchConfig;
+export class BigToolSearch implements SearchIndex {
+  private config: BigToolSearchConfig;
   private tools: ToolMetadata[] = [];
   private initialized = false;
 
-  constructor(config: Partial<OramaSearchConfig> = {}) {
+  constructor(config: Partial<BigToolSearchConfig> = {}) {
     this.config = {
       mode: config.mode ?? 'bm25',
       embeddings: config.embeddings,
@@ -79,7 +84,7 @@ export class OramaSearch implements SearchIndex {
 
     // Validate config
     if ((this.config.mode === 'vector' || this.config.mode === 'hybrid') && !this.config.embeddings) {
-      throw new Error(`OramaSearch: 'embeddings' is required for '${this.config.mode}' mode`);
+      throw new Error(`BigToolSearch: 'embeddings' is required for '${this.config.mode}' mode`);
     }
   }
 
@@ -97,7 +102,7 @@ export class OramaSearch implements SearchIndex {
 
   async search(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
     if (!this.initialized) {
-      throw new Error('OramaSearch: Must call index() before searching');
+      throw new Error('BigToolSearch: Must call index() before searching');
     }
 
     const limit = options.limit ?? 5;
@@ -160,7 +165,12 @@ export class OramaSearch implements SearchIndex {
   }
 
   /** Get current configuration */
-  getConfig(): OramaSearchConfig {
+  getConfig(): BigToolSearchConfig {
     return { ...this.config };
   }
 }
+
+/**
+ * @deprecated Use BigToolSearch instead
+ */
+export const OramaSearch = BigToolSearch;

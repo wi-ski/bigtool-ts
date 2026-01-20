@@ -1,5 +1,5 @@
 /**
- * OramaSearch module.
+ * BigToolSearch module.
  *
  * Provides a powerful search index implementation using @orama/orama,
  * supporting BM25 text search, vector semantic search, and hybrid modes.
@@ -51,12 +51,12 @@ function toolToEmbeddingText(tool) {
     return parts.filter(Boolean).join(" ");
 }
 // ═══════════════════════════════════════════════════════════════════════════
-// OramaSearch Implementation
+// BigToolSearch Implementation
 // ═══════════════════════════════════════════════════════════════════════════
 /**
  * Search index implementation using @orama/orama.
  *
- * OramaSearch provides fast, in-memory search for tool discovery.
+ * BigToolSearch provides fast, in-memory search for tool discovery.
  * It supports three search modes:
  *
  * - **BM25**: Fast text search using TF-IDF/BM25 algorithm. No API keys
@@ -70,9 +70,9 @@ function toolToEmbeddingText(tool) {
  *
  * @example BM25 Mode (default, no API keys needed)
  * ```typescript
- * import { OramaSearch } from '@repo/bigtool-ts';
+ * import { BigToolSearch } from 'bigtool-ts';
  *
- * const search = new OramaSearch({ mode: 'bm25' });
+ * const search = new BigToolSearch({ mode: 'bm25' });
  * await search.index(catalog.getAllMetadata());
  *
  * const results = await search.search('github pull request');
@@ -81,10 +81,10 @@ function toolToEmbeddingText(tool) {
  *
  * @example Vector Mode (semantic search)
  * ```typescript
- * import { OramaSearch } from '@repo/bigtool-ts';
+ * import { BigToolSearch } from 'bigtool-ts';
  * import { OpenAIEmbeddings } from '@langchain/openai';
  *
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'vector',
  *   embeddings: new OpenAIEmbeddings(),
  *   cache: new MemoryEmbeddingCache(),
@@ -96,7 +96,7 @@ function toolToEmbeddingText(tool) {
  *
  * @example Hybrid Mode (best of both)
  * ```typescript
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'hybrid',
  *   embeddings: new OpenAIEmbeddings(),
  *   weights: { bm25: 0.4, vector: 0.6 },
@@ -104,7 +104,7 @@ function toolToEmbeddingText(tool) {
  * });
  * ```
  */
-export class OramaSearch {
+export class BigToolSearch {
     /** @internal BM25 database */
     db = null;
     /** @internal Vector database */
@@ -120,7 +120,7 @@ export class OramaSearch {
     /** @internal Whether index() has been called */
     initialized = false;
     /**
-     * Creates a new OramaSearch instance.
+     * Creates a new BigToolSearch instance.
      *
      * @param config - Search configuration (mode, embeddings, etc.)
      * @throws Error if vector/hybrid mode is used without embeddings
@@ -128,13 +128,13 @@ export class OramaSearch {
      * @example
      * ```typescript
      * // BM25 (default)
-     * const search = new OramaSearch();
+     * const search = new BigToolSearch();
      *
      * // Explicit mode
-     * const search = new OramaSearch({ mode: 'bm25' });
+     * const search = new BigToolSearch({ mode: 'bm25' });
      *
      * // With custom boosts
-     * const search = new OramaSearch({
+     * const search = new BigToolSearch({
      *   mode: 'bm25',
      *   boost: { name: 3, keywords: 2, description: 1, categories: 1 },
      * });
@@ -143,7 +143,7 @@ export class OramaSearch {
     constructor(config = { mode: "bm25" }) {
         // Validate config
         if ((config.mode === "vector" || config.mode === "hybrid") && !config.embeddings) {
-            throw new Error(`OramaSearch: Embeddings provider required for ${config.mode} mode. ` +
+            throw new Error(`BigToolSearch: Embeddings provider required for ${config.mode} mode. ` +
                 "Pass an embeddings instance (e.g., new OpenAIEmbeddings()) in config.");
         }
         this.embeddings = config.embeddings;
@@ -182,7 +182,7 @@ export class OramaSearch {
      *
      * @example
      * ```typescript
-     * const search = new OramaSearch({ mode: 'bm25' });
+     * const search = new BigToolSearch({ mode: 'bm25' });
      * await search.index(catalog.getAllMetadata());
      * ```
      */
@@ -247,7 +247,7 @@ export class OramaSearch {
      */
     async search(query, options) {
         if (!this.db || !this.initialized) {
-            throw new Error("OramaSearch: Index not initialized. Call index() first.");
+            throw new Error("BigToolSearch: Index not initialized. Call index() first.");
         }
         const mode = options?.mode ?? this.config.mode;
         const limit = options?.limit ?? 5;
@@ -264,7 +264,7 @@ export class OramaSearch {
                 results = await this.searchHybrid(query, limit);
                 break;
             default:
-                throw new Error(`OramaSearch: Unknown search mode: ${mode}`);
+                throw new Error(`BigToolSearch: Unknown search mode: ${mode}`);
         }
         // Apply threshold filter
         if (threshold !== undefined) {
@@ -291,7 +291,7 @@ export class OramaSearch {
      */
     async reindex() {
         if (this.tools.length === 0) {
-            throw new Error("OramaSearch: No tools to reindex. Call index() first.");
+            throw new Error("BigToolSearch: No tools to reindex. Call index() first.");
         }
         await this.index(this.tools);
     }
@@ -382,7 +382,7 @@ export class OramaSearch {
      */
     async computeEmbeddings(tools) {
         if (!this.embeddings) {
-            throw new Error("OramaSearch: Embeddings provider not configured.");
+            throw new Error("BigToolSearch: Embeddings provider not configured.");
         }
         const embeddings = new Map();
         const toCompute = [];
@@ -424,11 +424,11 @@ export class OramaSearch {
  * Uses TF-IDF/BM25 algorithm for text matching.
  *
  * @param options - Optional configuration for field boosting
- * @returns Configured OramaSearch instance
+ * @returns Configured BigToolSearch instance
  *
  * @example
  * ```typescript
- * import { createBM25Search } from '@repo/bigtool-ts';
+ * import { createBM25Search } from 'bigtool-ts';
  *
  * const search = createBM25Search();
  * await search.index(tools);
@@ -442,7 +442,7 @@ export class OramaSearch {
  * ```
  */
 export function createBM25Search(options) {
-    return new OramaSearch({
+    return new BigToolSearch({
         mode: "bm25",
         boost: options?.boost,
     });
@@ -456,11 +456,11 @@ export function createBM25Search(options) {
  * @param embeddings - Embeddings provider for computing vectors
  * @param cache - Optional cache for storing computed embeddings
  * @param vectorSize - Embedding dimension (default: 1536 for OpenAI)
- * @returns Configured OramaSearch instance
+ * @returns Configured BigToolSearch instance
  *
  * @example
  * ```typescript
- * import { createVectorSearch } from '@repo/bigtool-ts';
+ * import { createVectorSearch } from 'bigtool-ts';
  * import { OpenAIEmbeddings } from '@langchain/openai';
  *
  * const search = createVectorSearch(
@@ -470,7 +470,7 @@ export function createBM25Search(options) {
  * ```
  */
 export function createVectorSearch(embeddings, cache, vectorSize) {
-    return new OramaSearch({
+    return new BigToolSearch({
         mode: "vector",
         embeddings,
         cache,
@@ -485,11 +485,11 @@ export function createVectorSearch(embeddings, cache, vectorSize) {
  *
  * @param embeddings - Embeddings provider for computing vectors
  * @param options - Configuration options
- * @returns Configured OramaSearch instance
+ * @returns Configured BigToolSearch instance
  *
  * @example
  * ```typescript
- * import { createHybridSearch } from '@repo/bigtool-ts';
+ * import { createHybridSearch } from 'bigtool-ts';
  * import { OpenAIEmbeddings } from '@langchain/openai';
  *
  * const search = createHybridSearch(new OpenAIEmbeddings(), {
@@ -499,7 +499,7 @@ export function createVectorSearch(embeddings, cache, vectorSize) {
  * ```
  */
 export function createHybridSearch(embeddings, options) {
-    return new OramaSearch({
+    return new BigToolSearch({
         mode: "hybrid",
         embeddings,
         cache: options?.cache,
@@ -508,4 +508,8 @@ export function createHybridSearch(embeddings, options) {
         vectorSize: options?.vectorSize,
     });
 }
+/**
+ * @deprecated Use BigToolSearch instead
+ */
+export const OramaSearch = BigToolSearch;
 //# sourceMappingURL=orama.js.map

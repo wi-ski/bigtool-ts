@@ -1,12 +1,12 @@
 /**
- * OramaSearch Tests
+ * BigToolSearch Tests
  * 
  * Comprehensive test suite for the search module.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
-  OramaSearch,
+  BigToolSearch,
   createBM25Search,
   createVectorSearch,
   createHybridSearch,
@@ -106,11 +106,11 @@ class MockEmbeddings implements Embeddings {
 // BM25 Search Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - BM25 Mode", () => {
-  let search: OramaSearch;
+describe("BigToolSearch - BM25 Mode", () => {
+  let search: BigToolSearch;
 
   beforeEach(async () => {
-    search = new OramaSearch({ mode: "bm25" });
+    search = new BigToolSearch({ mode: "bm25" });
     await search.index(testTools);
   });
 
@@ -203,13 +203,13 @@ describe("OramaSearch - BM25 Mode", () => {
 // Vector Search Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Vector Mode", () => {
-  let search: OramaSearch;
+describe("BigToolSearch - Vector Mode", () => {
+  let search: BigToolSearch;
   let mockEmbeddings: MockEmbeddings;
 
   beforeEach(async () => {
     mockEmbeddings = new MockEmbeddings();
-    search = new OramaSearch({
+    search = new BigToolSearch({
       mode: "vector",
       embeddings: mockEmbeddings,
       vectorSize: 8, // Match our mock embeddings dimension
@@ -218,7 +218,7 @@ describe("OramaSearch - Vector Mode", () => {
   });
 
   it("should require embeddings for vector mode", () => {
-    expect(() => new OramaSearch({ mode: "vector" })).toThrow(
+    expect(() => new BigToolSearch({ mode: "vector" })).toThrow(
       /Embeddings provider required/
     );
   });
@@ -245,13 +245,13 @@ describe("OramaSearch - Vector Mode", () => {
 // Hybrid Search Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Hybrid Mode", () => {
-  let search: OramaSearch;
+describe("BigToolSearch - Hybrid Mode", () => {
+  let search: BigToolSearch;
   let mockEmbeddings: MockEmbeddings;
 
   beforeEach(async () => {
     mockEmbeddings = new MockEmbeddings();
-    search = new OramaSearch({
+    search = new BigToolSearch({
       mode: "hybrid",
       embeddings: mockEmbeddings,
       weights: { bm25: 0.5, vector: 0.5 },
@@ -261,7 +261,7 @@ describe("OramaSearch - Hybrid Mode", () => {
   });
 
   it("should require embeddings for hybrid mode", () => {
-    expect(() => new OramaSearch({ mode: "hybrid" })).toThrow(
+    expect(() => new BigToolSearch({ mode: "hybrid" })).toThrow(
       /Embeddings provider required/
     );
   });
@@ -275,7 +275,7 @@ describe("OramaSearch - Hybrid Mode", () => {
 
   it("should respect weight configuration", async () => {
     // Create two searches with different weights
-    const bm25Heavy = new OramaSearch({
+    const bm25Heavy = new BigToolSearch({
       mode: "hybrid",
       embeddings: mockEmbeddings,
       weights: { bm25: 0.9, vector: 0.1 },
@@ -283,7 +283,7 @@ describe("OramaSearch - Hybrid Mode", () => {
     });
     await bm25Heavy.index(testTools);
 
-    const vectorHeavy = new OramaSearch({
+    const vectorHeavy = new BigToolSearch({
       mode: "hybrid",
       embeddings: mockEmbeddings,
       weights: { bm25: 0.1, vector: 0.9 },
@@ -304,13 +304,13 @@ describe("OramaSearch - Hybrid Mode", () => {
 // Mode Override Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Mode Override", () => {
-  let search: OramaSearch;
+describe("BigToolSearch - Mode Override", () => {
+  let search: BigToolSearch;
   let mockEmbeddings: MockEmbeddings;
 
   beforeEach(async () => {
     mockEmbeddings = new MockEmbeddings();
-    search = new OramaSearch({
+    search = new BigToolSearch({
       mode: "hybrid",
       embeddings: mockEmbeddings,
       vectorSize: 8,
@@ -416,13 +416,13 @@ describe("Embedding Cache", () => {
 // Caching Integration Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Caching", () => {
+describe("BigToolSearch - Caching", () => {
   it("should use cached embeddings on second search", async () => {
     const cache = new MemoryCache();
     const embeddings = new MockEmbeddings();
     const embedSpy = vi.spyOn(embeddings, "embedDocuments");
 
-    const search = new OramaSearch({
+    const search = new BigToolSearch({
       mode: "vector",
       embeddings,
       cache,
@@ -442,7 +442,7 @@ describe("OramaSearch - Caching", () => {
     const cache = new MemoryCache();
     const embeddings = new MockEmbeddings();
 
-    const search = new OramaSearch({
+    const search = new BigToolSearch({
       mode: "vector",
       embeddings,
       cache,
@@ -463,9 +463,9 @@ describe("OramaSearch - Caching", () => {
 // Reindex Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Reindex", () => {
+describe("BigToolSearch - Reindex", () => {
   it("should reindex correctly", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
     await search.index(testTools);
 
     // Reindex
@@ -477,7 +477,7 @@ describe("OramaSearch - Reindex", () => {
   });
 
   it("should throw if reindex called before index", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
 
     await expect(search.reindex()).rejects.toThrow(/No tools to reindex/);
   });
@@ -487,15 +487,15 @@ describe("OramaSearch - Reindex", () => {
 // Error Handling Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Error Handling", () => {
+describe("BigToolSearch - Error Handling", () => {
   it("should throw if search called before index", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
 
     await expect(search.search("github")).rejects.toThrow(/Index not initialized/);
   });
 
   it("should handle unknown mode gracefully", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
     await search.index(testTools);
 
     await expect(
@@ -683,9 +683,9 @@ describe("Result Merging", () => {
 // Count Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("OramaSearch - Count", () => {
+describe("BigToolSearch - Count", () => {
   it("should return correct count of indexed tools", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
     await search.index(testTools);
 
     const count = await search.count();
@@ -693,7 +693,7 @@ describe("OramaSearch - Count", () => {
   });
 
   it("should return 0 before indexing", async () => {
-    const search = new OramaSearch({ mode: "bm25" });
+    const search = new BigToolSearch({ mode: "bm25" });
 
     const count = await search.count();
     expect(count).toBe(0);

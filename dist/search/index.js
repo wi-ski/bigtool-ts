@@ -9,23 +9,23 @@
  * @example
  * ```typescript
  * // BM25 mode (default)
- * const search = new OramaSearch();
+ * const search = new BigToolSearch();
  *
  * // Vector mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'vector',
  *   embeddings: new OpenAIEmbeddings(),
  * });
  *
  * // Hybrid mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'hybrid',
  *   embeddings: new OpenAIEmbeddings(),
  *   weights: { bm25: 0.5, vector: 0.5 },
  * });
  * ```
  */
-export class OramaSearch {
+export class BigToolSearch {
     config;
     tools = [];
     initialized = false;
@@ -47,7 +47,7 @@ export class OramaSearch {
         };
         // Validate config
         if ((this.config.mode === 'vector' || this.config.mode === 'hybrid') && !this.config.embeddings) {
-            throw new Error(`OramaSearch: 'embeddings' is required for '${this.config.mode}' mode`);
+            throw new Error(`BigToolSearch: 'embeddings' is required for '${this.config.mode}' mode`);
         }
     }
     async index(tools) {
@@ -61,7 +61,7 @@ export class OramaSearch {
     }
     async search(query, options = {}) {
         if (!this.initialized) {
-            throw new Error('OramaSearch: Must call index() before searching');
+            throw new Error('BigToolSearch: Must call index() before searching');
         }
         const limit = options.limit ?? 5;
         const threshold = options.threshold ?? 0;
@@ -119,4 +119,8 @@ export class OramaSearch {
         return { ...this.config };
     }
 }
+/**
+ * @deprecated Use BigToolSearch instead
+ */
+export const OramaSearch = BigToolSearch;
 //# sourceMappingURL=index.js.map

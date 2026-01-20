@@ -77,9 +77,9 @@ export interface HybridWeights {
     vector: number;
 }
 /**
- * Configuration for OramaSearch
+ * Configuration for BigToolSearch
  */
-export interface OramaSearchConfig {
+export interface BigToolSearchConfig {
     /** Search mode: bm25, vector, or hybrid */
     mode: SearchMode;
     /** Required for vector/hybrid modes - embedding provider */
@@ -93,4 +93,8 @@ export interface OramaSearchConfig {
     /** Vector embedding dimension (default: 1536 for OpenAI) */
     vectorSize?: number;
 }
+/**
+ * @deprecated Use BigToolSearchConfig instead
+ */
+export type OramaSearchConfig = BigToolSearchConfig;
 //# sourceMappingURL=types.d.ts.map

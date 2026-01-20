@@ -7,7 +7,7 @@
 
 import { ChatOpenAI } from "@langchain/openai";
 import { createAgent } from "../../src/graph/agent.js";
-import { OramaSearch } from "../../src/search/orama.js";
+import { BigToolSearch } from "../../src/search/orama.js";
 import { allTools } from "../tools/index.js";
 
 export async function createBigtoolAgent() {
@@ -19,7 +19,7 @@ export async function createBigtoolAgent() {
   const agent = await createAgent({
     llm,
     tools: allTools, // Same tools, but discovered dynamically
-    search: new OramaSearch({ mode: "bm25" }),
+    search: new BigToolSearch({ mode: "bm25" }),
   });
 
   return agent;

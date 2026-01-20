@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-01-20
+
+### Changed
+
+- **BREAKING**: Renamed `OramaSearch` to `BigToolSearch` for better branding
+- **BREAKING**: Renamed `OramaSearchConfig` to `BigToolSearchConfig`
+- Both old names exported as deprecated aliases for backward compatibility
+
+### Migration
+
+```typescript
+// Before
+import { OramaSearch, OramaSearchConfig } from "bigtool-ts";
+const search = new OramaSearch({ mode: "bm25" });
+
+// After
+import { BigToolSearch, BigToolSearchConfig } from "bigtool-ts";
+const search = new BigToolSearch({ mode: "bm25" });
+
+// Old names still work (deprecated)
+import { OramaSearch } from "bigtool-ts"; // ⚠️ Deprecated
+```
+
 ## [0.1.4] - 2026-01-20
 
 ### Added

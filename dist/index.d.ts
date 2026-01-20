@@ -18,13 +18,13 @@
  *
  * @example Basic usage with local tools
  * ```typescript
- * import { createAgent, OramaSearch } from '@repo/bigtool-ts';
+ * import { createAgent, BigToolSearch } from 'bigtool-ts';
  * import { ChatOpenAI } from '@langchain/openai';
  *
  * const agent = await createAgent({
  *   llm: new ChatOpenAI({ model: 'gpt-4o' }),
  *   tools: [myTool1, myTool2, myTool3],
- *   search: new OramaSearch(),
+ *   search: new BigToolSearch(),
  * });
  *
  * const result = await agent.invoke({
@@ -38,8 +38,8 @@
  *   createAgent,
  *   LocalSource,
  *   MCPSource,
- *   OramaSearch,
- * } from '@repo/bigtool-ts';
+ *   BigToolSearch,
+ * } from 'bigtool-ts';
  *
  * const agent = await createAgent({
  *   llm: new ChatOpenAI({ model: 'gpt-4o' }),
@@ -47,7 +47,7 @@
  *     new LocalSource(myLocalTools),
  *     new MCPSource(mcpClient, { namespace: 'github' }),
  *   ],
- *   search: new OramaSearch({ mode: 'hybrid', embeddings }),
+ *   search: new BigToolSearch({ mode: 'hybrid', embeddings }),
  *   pinnedTools: [alwaysAvailableTool],
  * });
  * ```
@@ -62,7 +62,8 @@ export { LocalSource } from './sources/local.js';
 export { MCPSource, createMCPSource, type MCPSourceOptions, type MCPClient, type MCPServerConfig, type MCPStdioConfig, type MCPSSEConfig, type MCPWebSocketConfig, } from './sources/mcp.js';
 export { DynamicSource, type DynamicSourceOptions } from './sources/dynamic.js';
 export { DefaultToolCatalog } from './catalog/index.js';
-export { OramaSearch, type OramaSearchConfig } from './search/index.js';
+export { BigToolSearch, OramaSearch, // Deprecated alias
+type BigToolSearchConfig, type OramaSearchConfig, } from './search/index.js';
 export { DefaultToolLoader, type ToolLoaderOptions, } from './loader/index.js';
 export { ToolNotFoundError, SourceNotFoundError } from './loader/loader.js';
 export { ToolDiscoveryAnnotation, type ToolDiscoveryState, type ToolDiscoveryUpdate, type SearchQuery } from './graph/state.js';

@@ -1,6 +1,6 @@
 {
   "name": "bigtool-ts",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Dynamic tool discovery for AI agents. Search and load tools on-demand instead of loading all tools upfront.",
   "type": "module",
   "license": "MIT",

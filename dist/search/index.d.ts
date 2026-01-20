@@ -1,8 +1,8 @@
 import type { SearchIndex, SearchOptions, SearchResult, ToolMetadata } from '../types.js';
 /**
- * Configuration for Orama-based search
+ * Configuration for BigTool search
  */
-export interface OramaSearchConfig {
+export interface BigToolSearchConfig {
     /** Search mode */
     mode: 'bm25' | 'vector' | 'hybrid';
     /** Embeddings provider (required for vector/hybrid modes) */
@@ -23,6 +23,10 @@ export interface OramaSearchConfig {
     cache?: unknown;
 }
 /**
+ * @deprecated Use BigToolSearchConfig instead
+ */
+export type OramaSearchConfig = BigToolSearchConfig;
+/**
  * Default search implementation using @orama/orama for BM25 search.
  *
  * Supports three modes:
@@ -33,31 +37,35 @@ export interface OramaSearchConfig {
  * @example
  * ```typescript
  * // BM25 mode (default)
- * const search = new OramaSearch();
+ * const search = new BigToolSearch();
  *
  * // Vector mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'vector',
  *   embeddings: new OpenAIEmbeddings(),
  * });
  *
  * // Hybrid mode
- * const search = new OramaSearch({
+ * const search = new BigToolSearch({
  *   mode: 'hybrid',
  *   embeddings: new OpenAIEmbeddings(),
  *   weights: { bm25: 0.5, vector: 0.5 },
  * });
  * ```
  */
-export declare class OramaSearch implements SearchIndex {
+export declare class BigToolSearch implements SearchIndex {
     private config;
     private tools;
     private initialized;
-    constructor(config?: Partial<OramaSearchConfig>);
+    constructor(config?: Partial<BigToolSearchConfig>);
     index(tools: ToolMetadata[]): Promise<void>;
     search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
     reindex(): Promise<void>;
     /** Get current configuration */
-    getConfig(): OramaSearchConfig;
+    getConfig(): BigToolSearchConfig;
 }
+/**
+ * @deprecated Use BigToolSearch instead
+ */
+export declare const OramaSearch: typeof BigToolSearch;
 //# sourceMappingURL=index.d.ts.map
