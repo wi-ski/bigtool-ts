@@ -7,7 +7,7 @@
  * @module graph/agent
  */
 import { StateGraph, START, END } from "@langchain/langgraph";
-import { ToolDiscoveryAnnotation } from "./state.js";
+import { ToolDiscoveryAnnotation, } from "./state.js";
 import { createAgentNode, createSearchNode, createExecuteNode, routeNode, routeAfterSearch, } from "./nodes.js";
 import { createSearchToolsTool } from "./search-tool.js";
 import { DefaultToolCatalog } from "../catalog/index.js";

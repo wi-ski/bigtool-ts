@@ -15,11 +15,11 @@ export interface SearchQuery {
  */
 export declare const ToolDiscoveryAnnotation: import("@langchain/langgraph").AnnotationRoot<{
     /** Conversation messages with automatic message merging */
-    messages: import("@langchain/langgraph").BinaryOperatorAggregate<BaseMessage<import("@langchain/core/messages").MessageStructure<import("@langchain/core/messages").MessageToolSet>, import("@langchain/core/messages").MessageType>[], BaseMessage<import("@langchain/core/messages").MessageStructure<import("@langchain/core/messages").MessageToolSet>, import("@langchain/core/messages").MessageType>[]>;
+    messages: import("@langchain/langgraph").BaseChannel<BaseMessage<import("@langchain/core/messages").MessageStructure<import("@langchain/core/messages").MessageToolSet>, import("@langchain/core/messages").MessageType>[], BaseMessage<import("@langchain/core/messages").MessageStructure<import("@langchain/core/messages").MessageToolSet>, import("@langchain/core/messages").MessageType>[] | import("@langchain/langgraph").OverwriteValue<BaseMessage<import("@langchain/core/messages").MessageStructure<import("@langchain/core/messages").MessageToolSet>, import("@langchain/core/messages").MessageType>[]>, unknown>;
     /** Currently selected tool IDs (available to the agent) */
-    selectedToolIds: import("@langchain/langgraph").BinaryOperatorAggregate<string[], string[]>;
+    selectedToolIds: import("@langchain/langgraph").BaseChannel<string[], string[] | import("@langchain/langgraph").OverwriteValue<string[]>, unknown>;
     /** History of search queries for context */
-    searchHistory: import("@langchain/langgraph").BinaryOperatorAggregate<SearchQuery[], SearchQuery[]>;
+    searchHistory: import("@langchain/langgraph").BaseChannel<SearchQuery[], SearchQuery[] | import("@langchain/langgraph").OverwriteValue<SearchQuery[]>, unknown>;
 }>;
 export type ToolDiscoveryState = typeof ToolDiscoveryAnnotation.State;
 export type ToolDiscoveryUpdate = typeof ToolDiscoveryAnnotation.Update;

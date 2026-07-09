@@ -3,4 +3,4 @@
  * 
  * Re-exports withMetadata from the main types module.
  */
-export { withMetadata } from "../types";
+export { withMetadata } from "../types.js";

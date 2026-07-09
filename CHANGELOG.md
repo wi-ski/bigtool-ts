@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-07-09
+
+### Changed
+
+- Bumped LangChain peer floors to 1.x (`@langchain/core`, `@langchain/langgraph`, `@langchain/openai`)
+- Upgraded runtime deps: `@orama/orama`, `lru-cache`, `zod`, `eventemitter3`
+- Upgraded tooling: TypeScript, Vitest, `tsx`, `@types/node`
+
 ## [0.1.5] - 2026-01-20
 
 ### Changed

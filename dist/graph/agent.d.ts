@@ -10,7 +10,7 @@ import type { BaseChatModel } from "@langchain/core/language_models/chat_models"
 import type { StructuredTool } from "@langchain/core/tools";
 import type { CompiledStateGraph } from "@langchain/langgraph";
 import type { ToolSource, SearchIndex } from "../types.js";
-import { type ToolDiscoveryState } from "./state.js";
+import { type ToolDiscoveryState, type ToolDiscoveryUpdate } from "./state.js";
 /**
  * Configuration options for createAgent.
  *
@@ -112,8 +112,11 @@ export interface CreateAgentOptions {
  *
  * This is the return type of createAgent and createToolDiscoveryGraph.
  * Can be invoked with messages to run the agent.
+ *
+ * Kept intentionally loose across LangGraph 1.x CompiledStateGraph
+ * generic expansions (OverwriteValue, stream transformers, etc.).
  */
-export type CompiledToolDiscoveryGraph = CompiledStateGraph<ToolDiscoveryState, Partial<ToolDiscoveryState>, "__start__" | "agent" | "search" | "execute">;
+export type CompiledToolDiscoveryGraph = CompiledStateGraph<ToolDiscoveryState, ToolDiscoveryUpdate, "__start__" | "agent" | "search" | "execute">;
 /**
  * Creates a LangGraph agent with dynamic tool discovery.
  *
