@@ -7,7 +7,7 @@
   "author": "wiski",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wi-ski/bigtool-ts"
+    "url": "git+https://github.com/wi-ski/bigtool-ts.git"
   },
   "bugs": {
     "url": "https://github.com/wi-ski/bigtool-ts/issues"
